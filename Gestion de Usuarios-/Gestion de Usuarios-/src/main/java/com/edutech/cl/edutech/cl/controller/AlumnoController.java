@@ -1,4 +1,5 @@
-package com.edutech.cl.edutech.cl.controller;
+
+	package com.edutech.cl.edutech.cl.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,6 @@ public class AlumnoController {
     @Autowired
     private AlumnoService alumnoService;
 
-
     @Operation(summary = "Obtiene el listado de matriculas")
     @ApiResponse(responseCode = "200", description = "Lista obtenida en forma exitosa",
         content = @Content(mediaType = "application/json",
@@ -53,36 +53,35 @@ public class AlumnoController {
 
     @Operation(summary = "Crea una nueva Matricula")
     @ApiResponses(value ={
-        @ApiResponse(responseCode = "201",description = "Matricula creada exitosamente",
+        @ApiResponse(responseCode = "201",description = "Alumnocreada exitosamente",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = Matricula.class))),
         @ApiResponse(responseCode = "400",description = "Solicitud inválida"),
         @ApiResponse(responseCode = "500",description = "Error interno del servidor")
     })
     @PostMapping
-    public Matricula agregarMatricula(@RequestBody Matricula matricula){
+    public AlumnoagregarMatricula(@RequestBody Alumnomatricula){
         
         //HATE OAS
-        Matricula nueva = matriculaService.save(matricula);
+        Alumnonueva = matriculaService.save(matricula);
         nueva.add(linkTo(methodOn(MatriculaController.class).buscarMatricula(nueva.getId())).withSelfRel()); // línea HATEOAS
         return nueva;
 
-        //Retornamos el objeto Matricula como variable "nueva", enriquecido con links
+        //Retornamos el objeto Alumnocomo variable "nueva", enriquecido con links
     }
 
-
-    @Operation(summary = "Obtiene una Matricula por su ID")
+    @Operation(summary = "Obtiene una Alumnopor su ID")
     @ApiResponses(value ={
-        @ApiResponse(responseCode = "200",description = "Matricula encontrada",
+        @ApiResponse(responseCode = "200",description = "Alumnoencontrada",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = Matricula.class))),
-        @ApiResponse(responseCode = "404",description = "Matricula no encontrada"),
+        @ApiResponse(responseCode = "404",description = "Alumnono encontrada"),
         @ApiResponse(responseCode = "500",description = "Error interno del servidor")
     })
     @GetMapping("{id}")
-    public Matricula buscarMatricula(@PathVariable Integer id)
+    public AlumnobuscarMatricula(@PathVariable Integer id)
     {   
-        Matricula matricula = matriculaService.findById(id);
+        Alumnoalumno= matriculaService.findById(id);
         matricula.add(linkTo(methodOn(MatriculaController.class).buscarMatricula(id)).withSelfRel()); //HATE OAS
 
         //Agregamos link en la respuesta
@@ -90,17 +89,16 @@ public class AlumnoController {
         return matricula;
     }
 
-
-    @Operation(summary = "Crea una nueva Matricula simulando un pago y agregando al Alumno en su Base de datos")
+    @Operation(summary = "Crea una nueva Alumnosimulando un pago y agregando al Alumno en su Base de datos")
     @ApiResponses(value ={
-        @ApiResponse(responseCode = "201",description = "Matricula creada exitosamente, el pago fue verificado",
+        @ApiResponse(responseCode = "201",description = "Alumnocreada exitosamente, el pago fue verificado",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = Matricula.class))),
         @ApiResponse(responseCode = "400",description = "Solicitud inválida, el pago no fue verificado"),
         @ApiResponse(responseCode = "500",description = "Error interno del servidor")
     })
     @PostMapping("/Simulacion")
-    public Map<String, String> procesarPago(@RequestBody Matricula matricula) {
+    public Map<String, String> procesarPago(@RequestBody Alumnomatricula) {
         Map<String, String> respuesta = new HashMap<>();
 
         if (matricula.getMonto() > 0 && matricula.getAlumno() != null) {
@@ -110,13 +108,11 @@ public class AlumnoController {
             respuesta.put("estado", "exitoso");
             respuesta.put("mensaje", "Pago procesado, entregando detalles:" + matricula.getAlumno());
 
-
             String enlace = linkTo(methodOn(MatriculaController.class).buscarMatricula(matricula.getId())).withSelfRel().getHref();
             respuesta.put("link: ", enlace);
 
             //Agregamos link en la respuesta
             //HATE OAS
-
 
         } else {
             respuesta.put("estado", "rechazado");
